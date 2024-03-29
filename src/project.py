@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-DATA_DIR = "./Dataset/lfw-deepfunneled/lfw-deepfunneled"
+DATA_DIR = "../Dataset/lfw-deepfunneled/lfw-deepfunneled"
 
 start_time = time.time()
 

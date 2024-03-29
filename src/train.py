@@ -5,11 +5,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 
-df = pd.read_csv("train.csv", header=None)
+df = pd.read_csv("../train.csv", header=None)
 X_train = df.iloc[:, :-1]
 y_train = df.iloc[:, -1]
 
-df = pd.read_csv("test.csv", header=None)
+df = pd.read_csv("../test.csv", header=None)
 X_test = df.iloc[:, :-1]
 y_test = df.iloc[:, -1]
 

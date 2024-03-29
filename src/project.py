@@ -89,13 +89,13 @@ lda.fit(X_train_t, y_train)
 X_train_t = lda.transform(X_train_t)
 X_test_t = lda.transform(X_test_t)
 
-with open("test.csv", "w") as f:
+with open("../test.csv", "w") as f:
     for i in range(X_test_t.shape[0]):
         for j in range(X_test_t.shape[1]):
             f.write(f"{X_test_t[i][j]},")
         f.write(f"{y_test[i]}\n")
 
-with open("train.csv", "w") as f:
+with open("../train.csv", "w") as f:
     for i in range(X_train_t.shape[0]):
         for j in range(X_train_t.shape[1]):
             f.write(f"{X_train_t[i][j]},")

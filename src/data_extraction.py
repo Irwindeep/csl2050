@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+import os
+import torch
 DATA_DIR = "../Dataset/lfw-deepfunneled/lfw-deepfunneled"   # Directory containing all the images
 
 # Calling the function to fetch and load images
@@ -24,35 +26,79 @@ for i in range(10):
 plt.tight_layout()
 plt.show()
 
+# Storing faces as 1-D array
+X = faces.reshape(len(faces), -1)
+y = target
+
+if os.path.exists('X_hog.npy') and os.path.exists('I_hog.npy'):
+    # Load array if file exists
+    X_hog = np.load('X_hog.npy')
+    I_hog = np.load('I_hog.npy')
+    print("HoG features loaded from files")
+else:
+    X_hog = []
+    I_hog = []
+
+    for i, face in enumerate(faces):
+        hog_f, hog_i = compute_hog(face)
+        X_hog.append(hog_f)
+        I_hog.append(hog_i)
+        if(i%100 == 0): print(f"Images Processed: [{i}/{paths.shape[0]}]")
+
+    X_hog = np.array(X_hog)
+    I_hog = np.array(I_hog)
+    np.save('X_hog.npy', X_hog)
+    np.save('I_hog.npy', I_hog)
+
 # Plotting HoG features
 plt.figure(figsize=(10, 4))
 for i in range(10):
-    hog_f, hog_i = compute_hog(paths[i])
     plt.subplot(2, 5, i + 1)
-    plt.imshow(hog_i)
+    plt.imshow(I_hog[i])
     plt.title(target_names[target[i]])
     plt.axis('off')
 plt.tight_layout()
 plt.show()
 
+if os.path.exists('X_lbp.npy'):
+    # Load array if file exists
+    X_lbp = np.load('X_lbp.npy')
+    print("LBP features loaded from file X_lbp.npy")
+else:
+    X_lbp = []
+
+    for i, path in enumerate(paths):
+        lbp = calcLBP(path)
+        if(i%100 == 0): print(f"Images Processed: [{i}/{paths.shape[0]}]")
+
+    X_lbp = np.array(X_hog)
+    np.save('X_lbp.npy', X_lbp)
+
 # Plotting the histograms for LBP Features
 plt.figure(figsize=(10, 4))
 for i in range(10):
-    hist_lbp = calcLBP(paths[i])
     plt.subplot(2, 5, i + 1)
-    plt.plot(hist_lbp)
+    plt.plot(X_lbp[i])
     plt.title(target_names[target[i]])
     plt.xlabel("Pixel Value")
 plt.tight_layout()
 plt.show()
 
-feats = extract_cnn_features(paths[0], resnet)
-print(f"CNN features for {paths[0]}:")
-print(feats)
+if os.path.exists('X_cnn.npy'):
+    X_cnn = np.load('X_cnn.npy')
+    print("CNN features loaded from X_cnn.npy")
+else:
+    X_cnn = []
 
-# Storing faces as 1-D array
-X = faces.reshape(len(faces), -1)
-y = target
+    for i, path in enumerate(paths):
+        cnn = extract_cnn_features(path, resnet)
+        X_cnn.append(cnn)
+        if(i%100 == 0): print(f"Images Processed: [{i}/{paths.shape[0]}]")
+
+    # Stack the features into a single numpy array
+    X_cnn = torch.stack(X_cnn).numpy()
+
+    np.save('X_cnn.npy', X_cnn)
 
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=42)
@@ -101,9 +147,6 @@ plt.show()
 # Fitting the dataset to LDA
 lda = LinearDiscriminantAnalysis()
 lda.fit(X_train_t, y_train)
-
-# Printing the LDA projection vector
-print(f"LDA Projection Vector: {lda.coef_[0]}")
 
 # Transforming the dataset along the LDA projection vector
 X_train_t = lda.transform(X_train_t)

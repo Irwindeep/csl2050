@@ -8,7 +8,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 DATA_DIR = "../Dataset/lfw-deepfunneled/lfw-deepfunneled"   # Directory containing all the images
 
 # Calling the function to fetch and load images
-faces, target, target_names, paths = fetch_lfw_deep_people(DATA_DIR, resize=0.4, min_faces_per_person=20)
+faces, target, target_names, paths = fetch_lfw_deep_people(DATA_DIR, resize=0.4, min_faces_per_person=40)
 
 print(faces.shape, target.shape, target_names.shape)
 h = faces.shape[1]
@@ -55,7 +55,7 @@ X = faces.reshape(len(faces), -1)
 y = target
 
 # Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=42)
 
 # Fitting data to PCA model
 pca = PCA()

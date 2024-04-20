@@ -1,4 +1,3 @@
-import time
 from data import fetch_lfw_deep_people
 import matplotlib.pyplot as plt
 from features import compute_hog, calcLBP
@@ -7,8 +6,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 DATA_DIR = "../Dataset/lfw-deepfunneled/lfw-deepfunneled"
-
-start_time = time.time()
 
 faces, target, target_names, paths = fetch_lfw_deep_people(DATA_DIR, resize=0.4, min_faces_per_person=20)
 

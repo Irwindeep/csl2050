@@ -122,4 +122,4 @@ with open("./train.csv", "w") as f:
             f.write(f"{X_train_t[i][j]},")
         f.write(f"{y_train[i]}\n")
 
-print(f"Dimensions of transformed data: {X_train_t.shape}")
+print(f"Dimensions of transformed data: {X_train_t.shape[1]}")

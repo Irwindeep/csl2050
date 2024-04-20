@@ -1,14 +1,21 @@
 from skimage.feature import hog
 from skimage.io import imread
 import cv2
+from PIL import Image
 import numpy as np
+import torch
+import torch.nn as nn
+import torchvision.models as models
+import torchvision.transforms as transforms
 
+# Function to compute HoG features (already provided)
 def compute_hog(img):
   image = imread(img)
   fd, hog_image = hog(image, orientations=9, pixels_per_cell=(8, 8),
                     cells_per_block=(2, 2), visualize=True, channel_axis=-1)
   return fd, hog_image
 
+# Functions to calculate LBP features (already provided)
 def get_pixel(img, center, x, y):
     new_value = 0
     try:
@@ -48,3 +55,30 @@ def calcLBP(image):
              img_lbp[i, j] = lbp_calculated_pixel(img_gray, i, j)
     hist_lbp = cv2.calcHist([img_lbp], [0], None, [256], [0, 256])
     return hist_lbp
+
+# Load pre-trained ResNet-50 model
+resnet = models.resnet50(pretrained=True)
+# Remove the last fully connected layer
+resnet = nn.Sequential(*list(resnet.children())[:-1])
+# Set the model to evaluation mode
+resnet.eval()
+
+# Define a function to extract features from an image
+def extract_cnn_features(image_path, model):
+    # Load and preprocess the image
+    image = Image.open(image_path).convert('RGB')
+    preprocess = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    image = preprocess(image)
+    # Add batch dimension
+    image = image.unsqueeze(0)
+    # Extract features
+    with torch.no_grad():
+        features = model(image)
+    # Remove the batch dimension
+    features = features.squeeze(0)
+    return features
